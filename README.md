@@ -1,1 +1,3 @@
-# img2math
+# my-photomath
+
+
