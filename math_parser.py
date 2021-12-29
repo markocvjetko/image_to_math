@@ -7,7 +7,7 @@ priority = {0:'[0-9]+',
             4:'[0-9]+\/[0-9]+',
             5:'\([^()]*\)'}
 
-expression = '1+2'
+#expression = '1+2'
 
 def max_prio(expression):
     for key, value in sorted(priority.items(), key=lambda x: x[0], reverse=True):
@@ -54,5 +54,5 @@ def parse_expression(expression):
     return int(expression)
 
 
-expression = '10/1+(2-1)*8'
-print(parse_expression(expression))
+#expression = '10/1+(2-1)*8'
+#print(parse_expression(expression))
