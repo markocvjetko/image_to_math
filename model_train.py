@@ -10,8 +10,8 @@ import torch.nn as nn
 from NeuralNetwork import NeuralNetwork
 from image_utils import zero_one_format
 
-train_data_path = 'merged_dataset/train'
-test_data_path = 'merged_dataset/test'
+train_data_path = 'dataset/train'
+test_data_path = 'dataset/test'
 
 train_image_paths = []
 classes = []
