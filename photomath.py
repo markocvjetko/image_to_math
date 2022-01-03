@@ -9,6 +9,7 @@ from math_parser import parse_expression
 from math_utils import symbol_words_to_symbol_characters
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 IMAGE_PATH = ROOT_DIR + '/math-examples/11.jpg'
 MODEL_PATH = ROOT_DIR + '/model.pth'
 CLASS_DICT_PATH = ROOT_DIR + '/class-ids.txt'
