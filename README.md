@@ -2,10 +2,11 @@
 
 Photomath pre-interview assignment solution.
 
-Unzip math-examples.zip and dataset.zip to the project root directory
-To train the model, run model_train.py. Model_train.py saves the model as model.pth and class id dictionary as class-ids.txt.
-To see how the OCR works, run OCR_and_processing_demo.py. The demo uses math-examples. Press any key to continue with image loading.
-To solve a math expression from an image, run photomath.py.
+Instructions:
+- Unzip math-examples.zip and dataset.zip to the project root directory
+- To train the model, run model_train.py. Model_train.py saves the model as model.pth and class id dictionary as class-ids.txt.
+- To see how the OCR works, run OCR_and_processing_demo.py. The demo uses math-examples. Press any key to continue with image loading.
+- To solve a math expression from an image, run photomath.py.
 
 
 Current milestones:
