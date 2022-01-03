@@ -125,7 +125,7 @@ def crop_image(image, bounding_box):
 
     return image[y:y + height, x:x + width]
 
-def draw_bounding_boxes(image, bounding_boxes, color=127):
+def draw_bounding_boxes(image, bounding_boxes, color=255):
     '''
     Draws specified bounding boxes on the image
 
@@ -136,5 +136,5 @@ def draw_bounding_boxes(image, bounding_boxes, color=127):
     '''
     image_bbs = image
     for x, y, width, height in bounding_boxes:
-        image_bbs = cv.rectangle(image_bbs, (x, y), (x+width, y+height), color=color, thickness=2)
+        image_bbs = cv.rectangle(image_bbs, (x, y), (x+width, y+height), color=color, thickness=3)
     return image_bbs
