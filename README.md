@@ -1,6 +1,8 @@
 # my-photomath
 
-Photomath pre-interview assignment solution.
+Photomath pre-interview assignment solution. The goal is to implement a simple Photomath 'application', capable of calculating basic math expressions from photographs of hand drawn symbols. 
+
+The algorithm processes images to a black and white palette, finds larger contours (to counter rogue pixels) and then finds their bounding boxes. The images inside bounding boxes are sorted component and fed into a neural network which returns a symbol which the bound contour represents. Symbols are then fed into a math parser as a single string which calculates the expression. 
 
 Instructions:
 - Unzip math-examples.zip and dataset.zip to the project root directory
@@ -15,6 +17,7 @@ Current milestones:
 - created a simple OCR using openCV.
 - math parser functionality added.
 - photomath.py added. Outputs a math expression and its result from a given image.
+
 
 To-do: 
 - improve image preprocessing. Performance depends greatly on image brightness. 
