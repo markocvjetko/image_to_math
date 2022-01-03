@@ -1,84 +1,46 @@
-import pickle
-import cv2 as cv
 import os
-import math
-import torch
-from NeuralNetwork import NeuralNetwork
-from math_parser import parse_expression
+import pickle
 
-BORDER_COLOR = 255
-CONTRAST_TRESHOLD = 130
+import torch
+
+from NeuralNetwork import NeuralNetwork
+from image_utils import *
+from math_parser import parse_expression
+from math_utils import symbol_words_to_symbol_characters
+
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-IMAGE_PATH = ROOT_DIR + '/image-examples/3.jpg'
+IMAGE_PATH = ROOT_DIR + '/image-examples/11.jpg'
 MODEL_PATH = ROOT_DIR + '/model.pth'
 CLASS_DICT_PATH = ROOT_DIR + '/class-ids.txt'
 
+BORDER_COLOR = 255
+CONTRAST_TRESHOLD = 90
 
-def color_format_to_greyscale(image):
-    if len(image.shape) == 3:  # shape 3 for colored images, 2 for greyscale
-        return cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    else:
-        return image
-
-
-def contrastify(image):
-    (thresh, image_bw) = cv.threshold(image, CONTRAST_TRESHOLD, 255, cv.THRESH_BINARY)
-    return 255 - image_bw  # invert colors
-
-
-def find_bounding_boxes(image, cutoff=40):
-    contours, _ = cv.findContours(image, mode=cv.RETR_EXTERNAL, method=cv.CHAIN_APPROX_NONE)
-    bounding_boxes = []
-
-    for contour in contours:
-        bounding_box = cv.boundingRect(contour)
-        if bounding_box[2] > cutoff or bounding_box[3] > cutoff:
-            bounding_boxes.append(bounding_box)
-
-    bounding_boxes.sort()
-    return bounding_boxes
+def load_model_and_class_id_dict():
+    model = NeuralNetwork().double()
+    model.load_state_dict(torch.load(MODEL_PATH))
+    model.eval()
+    with open(CLASS_DICT_PATH, 'rb') as f:
+        class_ids = pickle.load(f)
+    return model, class_ids
 
 
-def calculate_border(width, height):
-    top, bottom, left, right = 0, 0, 0, 0
-    if width > height:
-        top = bottom = math.floor((width - height) / 2)
-        if (width - height) % 2:
-            bottom += 1
-    else:
-        left = right = math.floor((height - width) / 2)
-        if (height - width) % 2:
-            right += 1
-    return top, bottom, left, right
-
-
-def normalize(image):
-    resized = cv.resize(image, (200, 200), interpolation=cv.INTER_LINEAR)
-    resized = cv.resize(resized, (50, 50), interpolation=cv.INTER_LINEAR)
-    (thresh, resized) = cv.threshold(resized, CONTRAST_TRESHOLD, 255, cv.THRESH_BINARY)
-    return resized
-
-
-if __name__ == '__main__':
+def calculate():
 
     cropped_symbols = []
-    print('processing ' + IMAGE_PATH)
     image = cv.imread(IMAGE_PATH)
     image = color_format_to_greyscale(image)
-
-    cv.imshow('graycsale image', image)
-    cv.waitKey(0)
-
-    contrast_image = contrastify(image)
-    cv.imshow('graycsale image', contrast_image)
-    cv.waitKey(0)
-
+    show_image(image, 'image')
+    contrast_image = contrastify(image, CONTRAST_TRESHOLD)
+    contrast_image = negative(contrast_image)
+    show_image(contrast_image, 'image')
     bounding_boxes = find_bounding_boxes(contrast_image)
+    
     for i, bounding_box in enumerate(bounding_boxes):
         x, y, width, height = bounding_box
-        top, bottom, left, right = calculate_border(width, height)
+        cropped_image = crop_image(image, bounding_box)
 
-        cropped_image = image[y:y + height, x:x + width]
+        top, bottom, left, right = calculate_border(width, height)
         border_image = cv.copyMakeBorder(
             cropped_image,
             top=top,
@@ -89,51 +51,32 @@ if __name__ == '__main__':
             value=[BORDER_COLOR]
         )
         final = normalize(border_image)
+        final = contrastify(final, CONTRAST_TRESHOLD)
         cropped_symbols.append(final)
-        # cv.imshow('graycsale image', final)
-        # fcv.waitKey(0)
 
-model = NeuralNetwork().double()
-model.load_state_dict(torch.load(MODEL_PATH))
-model.eval()
-with open(CLASS_DICT_PATH, 'rb') as f:
-    class_ids = pickle.load(f)
-print(class_ids)
+        show_image(final, 'image')
 
-final = final / 255
-final = final[None, ...]
+    image_bbs = draw_bounding_boxes(contrast_image, bounding_boxes)
+    show_image(image_bbs, 'image')
 
-print(final.shape)
-print(torch.from_numpy(final).type)
-print(torch.from_numpy(final).shape)
-predic = model(torch.from_numpy(final))
-predic = predic.tolist()[0]
+    model, class_ids = load_model_and_class_id_dict()
+    expression = ''
 
-max_value = max(predic)
-max_index = predic.index(max_value)
+    for symbol in cropped_symbols:
+        symbol = zero_one_format(symbol)
+        symbol = symbol[None, ...]                                      # adds a dimension (needed for the model, why?) (batches?)
+        symbol_tensor = torch.from_numpy(symbol)
+        prediction = model(symbol_tensor)
+        prediction = prediction.tolist()[0]                             # "probability" for each class as list
 
-print(class_ids.get(max_index), '=', max_value)
-print(predic)
-expression = ''
-for symbol in cropped_symbols:
-    symbol = symbol / 255
-    symbol = symbol[None, ...]
-    predic = model(torch.from_numpy(symbol))
-    predic = predic.tolist()[0]
+        max_pred_val = max(prediction)
+        max_index = prediction.index(max_pred_val)
+        expression += class_ids.get(max_index)                          # append most likely class from dict
+        expression = symbol_words_to_symbol_characters(expression)      # parse math operators as words to symbols
 
-    max_value = max(predic)
-    max_index = predic.index(max_value)
-    expression += class_ids.get(max_index)
+    print(expression)
+    print(expression, '=', parse_expression(expression))                # math calculator call
+    return str(expression) + '=' + str(parse_expression(expression))
 
-symbol_dict = {'plus': '+',
-        'minus': '-',
-        'div': '/',
-        'mul': '*',
-        'colon-open': '(',
-        'colon-close': ')',
-        }
-for key, value in symbol_dict.items():
-    expression = expression.replace(key, value, -1)
-
-print(expression)
-print(expression, '=', parse_expression(expression))
+if __name__ == '__main__':
+    calculate()

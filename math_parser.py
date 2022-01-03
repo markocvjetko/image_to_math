@@ -1,4 +1,12 @@
+"""
+Parses and solves a math expression. Does not check if the expression is valid.
+Finds operators with highest priority, calculates their output and inserts the output
+in place of the operator and operands. The process is repeated until only a number remains.
+"""
 import re
+
+#Elements (operators) of a math expression as regex-es, alongside their priority. Key value switch
+# might be needed to represent elements of same priority.
 
 priority = {0:'[0-9]+',
             1:'[0-9]+\-[0-9]+',
@@ -7,9 +15,14 @@ priority = {0:'[0-9]+',
             4:'[0-9]+\/[0-9]+',
             5:'\([^()]*\)'}
 
-#expression = '1+2'
-
 def max_prio(expression):
+    """
+    Searches for operators and their operands as regex-es. Returns the priority of the
+    found operator with the highest priority.
+
+    :param expression:
+    :return:
+    """
     for key, value in sorted(priority.items(), key=lambda x: x[0], reverse=True):
         p = re.compile(value)
         m = p.search(expression)
@@ -17,7 +30,16 @@ def max_prio(expression):
             return key
     return None
 
-def parse_expression(expression):
+def parse_expression(expression):       #works, should be refactored
+    """
+
+    Parses and solves an integer math expression. Does not check if the expression is valid.
+    Finds operators with the highest priority, calculates their output and inserts the output
+    in place of the operator and operands. The process is repeated until only a number remains.
+
+    :param expression: Math expression as string
+    :return: expresion result as integer
+    """
     prio = max_prio(expression)
     temp = priority.get(prio)
     p = re.compile(priority.get(prio))
@@ -52,7 +74,3 @@ def parse_expression(expression):
         prio = max_prio(expression)
 
     return int(expression)
-
-
-#expression = '10/1+(2-1)*8'
-#print(parse_expression(expression))
