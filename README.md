@@ -20,7 +20,7 @@ Current milestones:
 
 
 To-do: 
-- improve image preprocessing. Performance depends greatly on image brightness. 
+- improve image preprocessing. Performance depends greatly on image brightness. Ignore surrounding symbols inside the bounding box.
 - experiment with different neural network architectures. Test their performance compared to the number of parameters.
 - expand math parser/solver functionality to include other operators and more complex expressions, expression validity checking,
   catching border cases such as division by zero, etc... 
