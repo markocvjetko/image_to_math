@@ -1,8 +1,6 @@
 import os
 import pickle
-
 import torch
-
 from NeuralNetwork import NeuralNetwork
 from image_utils import *
 from math_parser import parse_expression
@@ -26,7 +24,7 @@ def load_model_and_class_id_dict():
     return model, class_ids
 
 
-def calculate():
+def calculate():        #could use some refactoring, image printing is inside for demostration.
 
     cropped_symbols = []
     image = cv.imread(IMAGE_PATH)

@@ -10,7 +10,9 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
-            nn.Linear(512, 16)
+            nn.Linear(512, 128),
+            nn.ReLU(),
+            nn.Linear(128, 16)
         )
 
     def forward(self, x):
