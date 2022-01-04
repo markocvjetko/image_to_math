@@ -29,21 +29,4 @@ if __name__ == '__main__':
             cv.imshow('Characters found', image_bbs)
             cv.waitKey(0)
             cv.destroyAllWindows()
-            '''
-            for i, bounding_box in enumerate(bounding_boxes):
-                x, y, width, height = bounding_box
-                if width < 20 or height < 20:
-                    continue
-                top, bottom, left, right = image_utils.calculate_border(width, height)
-
-                cropped_image = image[y:y + height, x:x + width]
-                border_image = cv.copyMakeBorder(
-                    cropped_image,
-                    top=top,
-                    bottom=bottom,
-                    left=left,
-                    right=right,
-                    borderType=cv.BORDER_CONSTANT,
-                    value=[BORDER_COLOR]
-                )
-            '''
+            
