@@ -1,3 +1,8 @@
+'''
+Start of the Flask web application for project demonstration. Due to my unfamiliarity with
+Flask and university, the web app is unfinished.
+'''
+
 import os
 from flask import Flask, flash, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
